@@ -1,3 +1,37 @@
+a {
+  text-decoration: none;
+}
+
+*,*:after,*:before {
+  box-sizing: border-box;
+}
+
+button {
+  cursor: pointer;
+}
+fieldset {
+  border: none;
+  margin: 0px;
+  padding: 0px;
+}
+
+.primary-btn,.secondary-btn {
+  margin-bottom: 30px;
+  color: #FFF;
+  background-color: #ee5b21;
+  border: none;
+  padding: 15px 25px;
+  border-radius: 3px;
+  font-size: .8em;
+  cursor: pointer;
+}
+.primary-btn {
+  background-color: #ee5b21;
+}
+.secondary-btn {
+  background-color: #1779ba;
+}
+
 .App {
   text-align: center;
 }
@@ -8,8 +42,19 @@
 .App-header {
   background-color: #222;
   height: auto;
-  padding: 20px;
+  padding: 20px 0px;
   color: white;
+}
+.App-header a {
+  width: 100%;
+  display: block;
+}
+
+.App-header a h2 {
+  color: #FFF;
+  width: 75%;
+  margin-left: auto;
+  margin-right: auto;
 }
 .App-intro {
   font-size: large;
@@ -52,6 +97,122 @@
   padding: 50px 0px;
 }
 
+.score-area > * {
+  float: left;
+}
+.score-area:after {
+  clear: both;
+  display: table;
+  content: '';
+}
+.score-area p {
+  margin-top: 0px;
+  margin-bottom: 0px;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+.score-area span,.score-area p {
+  font-size: 1.4em;
+  padding: 5px;
+}
+.score-area span {
+  cursor: pointer;
+}
+
+
+/**************** SINGLE POST PAGE *******************/
+
+.post-page {
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.post-header button {
+  min-width: 100px;
+  text-align: center;
+}
+
+.post-header button:nth-of-type(2) {
+  margin-left: 15px;
+}
+
+.single-comment {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 10px;
+  border: 1px solid #eee;
+}
+
+.comment-score span {
+  padding: 10px;
+  font-size: 1.2em;
+}
+.comment-score span:nth-of-type(1),.comment-score span:nth-of-type(3){
+  cursor: pointer;
+}
+
+/******************** MODAL DESIGN *************************/
+
+.modal-overlay {
+  position: fixed;
+  top: 0px;
+  bottom: 0px;
+  right: 0px;
+  left: 0px;
+  background-color: rgba(0,0,0,0.75);
+}
+
+.modal-design {
+  bottom: auto;
+  right: auto;
+  left: 50%;
+  top: 10%;
+  width: 600px;
+  height: 600px;
+  margin-left: -300px;
+  position: absolute;
+  background-color: #FFF;
+  border-radius: 3px;
+  border: 1px solid #eee;
+  padding: 30px;
+  text-align: center;
+}
+.modal-design .x-button {
+  position: absolute;
+  right: 10px;
+  top: 2px;
+  font-size: 1.6em;
+  color: #000;
+  cursor: pointer;
+}
+.modal-design label,
+.modal-design input,
+.modal-design textarea {
+  display: block;
+  margin-bottom: 20px;
+}
+.modal-design label {
+  text-align: left;
+}
+.modal-design textarea {
+  width: 100%;
+  height: 80px;
+  font-size: .9em;
+  padding-left: 5px;
+  padding-top: 2px;
+  border: 1px solid #ccc;
+}
+
+.modal-design input {
+  width: 100%;
+  padding: 10px 0px 10px 10px;
+  font-size: 1.2em;
+}
+
+.comment-button {
+  float:right;
+}
 
 
 

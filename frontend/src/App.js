@@ -10,11 +10,6 @@ import './App.css';
 
 class App extends Component {
 
-  state = {
-  	categories: ['all'],
-  	posts: []
-  }
-
   capitalize = (str) => {
 	  return typeof str !== 'string'
 	    ? ''
@@ -42,6 +37,7 @@ class App extends Component {
   	}).then((data) => {
   		//Gatering all available comments
   		this.gatherComments(data)
+  		console.log()
   	}).then(() => {
   		this.gatherCategories()
   	})
@@ -62,13 +58,9 @@ class App extends Component {
 	arrOfId.forEach((id) => {
 		grabComments(id).then((comment) => {
 			let commentParse = JSON.parse(comment)
-			let commentIds = Object.keys(commentParse).map(key => commentParse[key].id)
-			let objComment = Object.keys(commentParse).reduce((accum, key) => {
-				let commId = commentParse[key].id
-				accum[commId] = commentParse[key]
-				this.props.getComments(accum)
-				return accum
-			}, {})
+			commentParse.forEach((comment) => {
+				this.props.getComments(comment)
+			})
 		})
 	})
   }
@@ -79,7 +71,7 @@ class App extends Component {
 		  	<Router>
 			  	<div className="App-holder">
 				  	<div className="App-header">
-			      		<h2>This is the beginning of my Comment App</h2>
+			      		<Link to='/'><h2>This is the beginning of my Comment App</h2></Link>
 			    	</div>
 			    	<div className="container">
 				    	<div className="Categories">
@@ -92,7 +84,6 @@ class App extends Component {
 				    		})}
 				    	</div>
 			    	</div>
-				  	<Route exact path="/" component={ShowPosts}/>
 				  	<Route exact path="/:category?" component={ShowPosts}/>
 				  	<Route path="/:category/:postId" component={PostPage} />
 			  	</div>
@@ -101,7 +92,7 @@ class App extends Component {
 	}
 }
 
-function mapStateToProps(posts){
+function mapStateToProps({posts}){
 	//console.log(posts)
 	return {
 		categories: Object.keys(posts.categories).map((cat) => {

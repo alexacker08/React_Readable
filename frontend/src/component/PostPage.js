@@ -1,36 +1,291 @@
 import React, {Component} from 'react';
 import {Route} from 'react-router-dom';
 import { connect } from 'react-redux';
+import Timestamp from 'react-timestamp';
+import { voteDown,voteUp,commentUp,commentDown,getComments,fetchingApi,deleteComment,addComment,editComment,} from './../actions/index.js';
+import {commentVoting,voting,postComment,fetchDeleteComment,fetchEditComment} from './../utils/api.js';
+import Modal from 'react-modal';
+import {Callout,Colors,Button} from 'react-foundation';
+import uuid4 from 'uuid';
 
 class PostPage extends Component {
 
-
-	componentDidMount(){
-
-
-
+	constructor(props){
+		super()
+		this.state = {
+			commentModalOpen:false,
+			commentHeader: '',
+			commentAuthor: '',
+			commentContent: '',
+			commentModalType:null,
+			commentId:'',
+			postModalOpen: false,
+			postModalTitle:'',
+			postModalBody:'',
+			postModalAuthor:''
+		}
+		this.handleInputChange.bind(this)
+		this.handleSubmit.bind(this)
 	}
-
-	testFunc(){
-
+	commentUp(id,num){
+		commentVoting(id,'upVote').then((res) => {
+			return res.ok
+		}).then((pass) => {
+			if(pass){
+				this.props.commentUp(id,num)
+			}
+		})
+	}
+	commentDown(id,num){
+		commentVoting(id,'downVote').then((res) => {
+			return res.ok
+		}).then((pass) => {
+			if(pass){
+				this.props.commentDown(id,num)
+			}
+		})
+	}
+	commentDelete(id){
+		fetchDeleteComment(id).then((res) => {
+			if(res.ok){
+				this.props.deleteComment(id)
+			}
+		})
+	}
+	postVoteUp(id,num){
+		voting(id,'upVote').then((data) => {
+			console.log(data)
+		}).then(() => {
+			this.props.postVoteUp(id,num)
+		})
+	}
+	postVoteDown(id,num){
+		voting(id,'downVote').then((data) => {
+			console.log(data)
+		}).then(() => {
+			this.props.postVoteDown(id,num)
+		})
+	}
+	handleInputChange(event){
+		const name = event.target.name
+		if(name === 'author_field'){
+			this.setState({commentAuthor:event.target.value})
+		} else if(name === 'comment_field'){
+			this.setState({commentContent:event.target.value})
+		}
+	}
+	postInputChange(event){
+		const postName = event.target.name
+		if(postName === 'post_title'){
+			this.setState({postModalTitle:event.target.value})
+		} else if(postName === 'post_body'){
+			this.setState({postModalBody:event.target.value})
+		} else if(postName === 'post_author'){
+			this.setState({postModalAuthor:event.target.value})
+		}
+	}
+	handleSubmit(event){
+		event.preventDefault();
+		const stamp = Date.now()
+		if(this.state.commentModalType === 'add'){
+			const parentId = this.props.post[0].id;
+			const uuid = uuid4();
+			const commentObj = {
+				id:uuid,
+				timestamp: stamp,
+				body:this.state.commentContent,
+				author:this.state.commentAuthor,
+				parentId:parentId,
+				voteScore: 1,
+				deleted: false,
+				parentDeleted: false
+			}
+			postComment(commentObj).then((res) => {
+				if(res.ok){
+					this.props.fetchApi(res.ok)
+				}
+			}).then((pass) => {
+					this.closeModal()
+					this.props.addComment(commentObj)
+					this.props.fetchApi(false)
+			})
+		} else if(this.state.commentModalType === 'edit'){
+			const editObj = {
+				id: this.state.commentId,
+				timestamp:stamp,
+				body:this.state.commentContent,
+			}
+			fetchEditComment(editObj).then((res) => {
+				if(res.ok){
+				 this.props.fetchApi(res.ok)
+				}
+			}).then(() => {
+				this.closeModal()
+				this.props.editComment(editObj)
+			})
+		}
+	}
+	openCommentModal(actionType,comment){
+		let content;
+		if(actionType === 'add'){
+			content = 'Add Your Comment Here'
+			this.setState((prevState) => ({
+				commentModalOpen: true,
+				commentHeader: content,
+				commentAuthor:'',
+				commentContent:'',
+				commentModalType:'add',
+			}))
+		} else if(actionType === 'edit') {
+			content = 'Edit Your Comment Here'
+			this.setState((prevState) => ({
+				commentModalOpen: true,
+				commentHeader: content,
+				commentAuthor:comment.author,
+				commentContent:comment.body,
+				commentModalType:'edit',
+				commentId:comment.id,
+			}))
+		}
+	}
+	openPostModal(){
+		this.setState(() => ({
+			postModalOpen:true,
+			postModalTitle:this.props.post[0].title,
+			postModalBody:this.props.post[0].body,
+			postModalAuthor:this.props.post[0].author
+		}))
+	}
+	closeModal(){
+		this.setState(() => ({
+			commentModalOpen: false,
+			postModalOpen: false,
+			commentId:''
+		}))
 	}
 
 	render(){
-		const {postId} = this.props.match.params
-		//console.log(this.props.match)
 		return (
 			<div className="post-page">
-				This is a Post Page {postId}
+				<div className="post-header">
+					<h2>POST</h2>
+					<Button className="primary-btn" onClick={() => this.openPostModal()}>Edit</Button>
+					<Button className="secondary-btn">Delete</Button>
+				</div>
+				<div className="post-content">
+				{this.props.post.map((indv) => {
+					return <div key={indv.id} className="post-area">
+								<p>Title: {indv.title}</p>
+								<p>Body: {indv.body}</p>
+								<p>Author: {indv.author}</p>
+								<p>Date: <Timestamp time={indv.timestamp} format='date' /></p>
+								<div className="score-area">
+									<span onClick={() => this.postVoteDown(indv.id,indv.voteScore)}>-</span>
+									<p>{indv.voteScore}</p>
+									<span onClick={() => this.postVoteUp(indv.id,indv.voteScore)}>+</span>
+								</div>
+							</div>
+				})}
+				</div>
+				<div className="comment-header">
+					<h2>COMMENTS</h2>
+				</div>
+				<div className="comment-content">
+					<Button onClick={() => this.openCommentModal('add')} className="primary-btn" color={Colors.PRIMARY}>Add a Comment</Button>
+				{this.props.comments.map((comment) => {
+					return <Callout color={Colors.PRIMARY} key={comment.id} className="single-comment">
+								<p>{comment.body}</p>
+								<p>{comment.author}</p>
+								<p><Timestamp time={comment.timestamp} format='date' /></p>
+								<div className="comment-score">
+									<span onClick={() => this.commentDown(comment.id,comment.voteScore)}>-</span>
+									<span>{comment.voteScore}</span>
+									<span onClick={() => this.commentUp(comment.id,comment.voteScore)}>+</span>
+								</div>
+								<div className="comment-button">
+									<Button onClick={() => this.openCommentModal('edit',comment)}>Edit</Button>
+									<Button onClick={() => this.commentDelete(comment.id)}>Delete</Button>
+								</div>
+							</Callout>
+				})}
+				</div>
+				<Modal
+					isOpen={this.state.commentModalOpen}
+					className="modal-design"
+					overlayClassName="modal-overlay"
+					contentLabel="comment-edit-modal"
+				>
+					<h3>{this.state.commentHeader}</h3>
+					<div onClick={() => this.closeModal()} className="x-button">X</div>
+					<form onSubmit={(e) => this.handleSubmit(e)}>
+						<fieldset>
+							<label>Comment</label>
+							<textarea name="comment_field" value={this.state.commentContent} onChange={(e) => this.handleInputChange(e)} />
+							<label>Author</label>
+							<input type="text" name="author_field" value={this.state.commentAuthor} onChange={(e) => this.handleInputChange(e)} />
+						</fieldset>
+						<Button className="secondary-btn">Submit</Button>
+					</form>
+				</Modal>
+				<Modal
+					isOpen={this.state.postModalOpen}
+					className="modal-design"
+					overlayClassName="modal-overlay"
+					contentLabel="post-edit-modal"
+				>
+					<h3>Edit this Post</h3>
+					<div onClick={() => this.closeModal()} className="x-button">X</div>
+					<form>
+						<fieldset>
+							<label>Title</label>
+							<input type="text" name="post_title" onChange={(e) => this.postInputChange(e)} value={this.state.postModalTitle} />
+							<label>Body</label>
+							<input type="text" name="post_body" onChange={(e) => this.postInputChange(e)} value={this.state.postModalBody} />
+							<label>Author</label>
+							<input type="text" name="post_author" onChange={(e) => this.postInputChange(e)} value={this.state.postModalAuthor} />
+						</fieldset>
+						<Button className="secondary-btn">Submit</Button>
+					</form>
+				</Modal>
 			</div>
 		)
 	}
 }
 
-function mapStatetoProps(){
+function mapStatetoProps({posts},thisProps){
+	const {postId} = thisProps.match.params
+	return {
+		post: Object.keys(posts.posts).filter((pId) => {
+			if(posts.posts[pId].id === postId){
+				return postId
+			}
+		}).map((id) => {
+			return posts.posts[id]
+		}),
+		comments: Object.keys(posts.comments).filter((comId) => {
+			if(posts.comments[comId].parentId === postId && !posts.comments[comId].deleted){
+				return comId
+			}
+		}).sort((commFirst,commSecond) => {
+			return posts.comments[commSecond].voteScore - posts.comments[commFirst].voteScore
+		}).map((id) => {
+			return posts.comments[id]
+		}),
+	}
+}
 
-
+function mapActionsToProps(dispatch){
+	return {
+		commentUp:(id,num) => dispatch(commentUp(id,num)),
+		commentDown:(id,num) => dispatch(commentDown(id,num)),
+		addComment:(data) => dispatch(addComment(data)),
+		editComment:(data) => dispatch(editComment(data)),
+		postVoteUp:(id,num) => dispatch(voteUp(id,num)),
+		postVoteDown:(id,num) => dispatch(voteDown(id,num)),
+		fetchApi:(bool) => dispatch(fetchingApi(bool)),
+		deleteComment:(id) => dispatch(deleteComment(id))
+	}
 }
 
 
-
-export default connect(mapStatetoProps)(PostPage)
+export default connect(mapStatetoProps,mapActionsToProps)(PostPage)
