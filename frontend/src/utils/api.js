@@ -70,7 +70,7 @@ export function fetchEditComment({id,timestamp,body}){
 		body:JSON.stringify({
 			timestamp,
 			body,
-		}).then((res) => res.text())
+		})
 	})
 }
 
@@ -81,6 +81,45 @@ export function fetchDeleteComment(id){
 			'Authorization':userAuth,
 			'Content-Type':'application/json'
 		}
+	})
+}
+export function fetchDeletePost(id){
+	return fetch(`${api}/posts/${id}`,{
+		method:'DELETE',
+		headers:{
+			'Authorization':userAuth,
+			'Content-Type':'application/json'
+		}
+	})
+}
+export function fetchAddPost({id,timestamp,title,body,author,category}){
+	return fetch(`${api}/posts`,{
+		method:'POST',
+		headers:{
+			'Authorization':userAuth,
+			'Content-Type':'application/json'
+		},
+		body:JSON.stringify({
+			id,
+			timestamp,
+			title,
+			body,
+			author,
+			category,
+		})
+	})
+}
+export function fetchEditPost({id,title,body}){
+	return fetch(`${api}/posts/${id}`,{
+		method:'PUT',
+		headers:{
+			'Authorization':userAuth,
+			'Content-Type':'application/json'
+		},
+		body:JSON.stringify({
+			title,
+			body,
+		})
 	})
 }
 

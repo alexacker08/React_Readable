@@ -2,6 +2,7 @@ import {
 	SHOW_CAT,
 	ADD_POST,
 	EDIT_POST,
+	DELETE_POST,
 	VOTE_UP,
 	VOTE_DOWN,
 	GET_COMMENTS,
@@ -17,20 +18,21 @@ import {combineReducers} from 'redux';
 const tempState = {
 	categories: {},
 	posts: {},
-	postEdit:{},
 	comments:{},
-	commentEdit:{},
 	fetchingAPI:false,
-	testComment:{}
 }
 
 
 function posts(state = tempState, action){
 	switch(action.type){
 		case ADD_POST:
-			return Object.assign({}, state, {
-				posts: action.post
-			})
+			return {
+				...state,
+				posts:{
+					...state.posts,
+					[action.post.id]:action.post
+				}
+			}
 		case SHOW_CAT:
 			return Object.assign({}, state, {
 				categories: action.cat
@@ -43,6 +45,30 @@ function posts(state = tempState, action){
 					[action.comment.id]:action.comment
 				}
 			}
+		case DELETE_POST:
+			return {
+				...state,
+				posts:{
+					...state.posts,
+					[action.postId]:{
+						...state.posts[action.postId],
+						deleted:true
+					}
+				}
+			}
+		case EDIT_POST:
+			return {
+				...state,
+				posts:{
+					...state.posts,
+					[action.post.id]:{
+						...state.posts[action.post.id],
+						body:action.post.body,
+						title:action.post.title
+					}
+				}
+			}
+
 		case VOTE_UP:
 			return {
 				...state,
@@ -109,6 +135,18 @@ function posts(state = tempState, action){
 				comments: {
 					...state.comments,
 					[action.comment.id]:action.comment
+				}
+			}
+		case EDIT_COMMENT:
+			return {
+				...state,
+				comments:{
+					...state.comments,
+					[action.comment.id]:{
+						...state.comments[action.comment.id],
+						body:action.comment.body,
+						timestamp:action.comment.timestamp,
+					}
 				}
 			}
 	}

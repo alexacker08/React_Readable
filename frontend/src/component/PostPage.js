@@ -2,8 +2,8 @@ import React, {Component} from 'react';
 import {Route} from 'react-router-dom';
 import { connect } from 'react-redux';
 import Timestamp from 'react-timestamp';
-import { voteDown,voteUp,commentUp,commentDown,getComments,fetchingApi,deleteComment,addComment,editComment,} from './../actions/index.js';
-import {commentVoting,voting,postComment,fetchDeleteComment,fetchEditComment} from './../utils/api.js';
+import { voteDown,voteUp,commentUp,commentDown,getComments,fetchingApi,deleteComment,addComment,editComment,editPost} from './../actions/index.js';
+import {commentVoting,voting,postComment,fetchDeleteComment,fetchEditComment,fetchEditPost} from './../utils/api.js';
 import Modal from 'react-modal';
 import {Callout,Colors,Button} from 'react-foundation';
 import uuid4 from 'uuid';
@@ -26,6 +26,7 @@ class PostPage extends Component {
 		}
 		this.handleInputChange.bind(this)
 		this.handleSubmit.bind(this)
+		this.handlePostSubmit.bind(this)
 	}
 	commentUp(id,num){
 		commentVoting(id,'upVote').then((res) => {
@@ -125,6 +126,21 @@ class PostPage extends Component {
 			})
 		}
 	}
+	handlePostSubmit(e){
+		e.preventDefault()
+		const editPost = {
+			id:this.props.post[0].id,
+			title:this.state.postModalTitle,
+			body:this.state.postModalBody,
+		}
+		fetchEditPost(editPost).then((res) => {
+			if(res.ok){
+				this.props.editPost(editPost)
+			}
+		}).then(() => {
+			this.closeModal()
+		})
+	}
 	openCommentModal(actionType,comment){
 		let content;
 		if(actionType === 'add'){
@@ -194,17 +210,22 @@ class PostPage extends Component {
 					<Button onClick={() => this.openCommentModal('add')} className="primary-btn" color={Colors.PRIMARY}>Add a Comment</Button>
 				{this.props.comments.map((comment) => {
 					return <Callout color={Colors.PRIMARY} key={comment.id} className="single-comment">
-								<p>{comment.body}</p>
-								<p>{comment.author}</p>
-								<p><Timestamp time={comment.timestamp} format='date' /></p>
-								<div className="comment-score">
-									<span onClick={() => this.commentDown(comment.id,comment.voteScore)}>-</span>
-									<span>{comment.voteScore}</span>
-									<span onClick={() => this.commentUp(comment.id,comment.voteScore)}>+</span>
-								</div>
-								<div className="comment-button">
-									<Button onClick={() => this.openCommentModal('edit',comment)}>Edit</Button>
-									<Button onClick={() => this.commentDelete(comment.id)}>Delete</Button>
+								<div className="row">
+									<div className="columns medium-6">
+										<p><span className="com-said">{comment.author} said:</span> {comment.body}</p>
+										<p><span className="com-said">Submitted on:</span> <Timestamp time={comment.timestamp} format='date' /></p>
+										<div className="comment-score">
+											<span onClick={() => this.commentDown(comment.id,comment.voteScore)}>-</span>
+											<span>{comment.voteScore}</span>
+											<span onClick={() => this.commentUp(comment.id,comment.voteScore)}>+</span>
+										</div>
+									</div>
+									<div className="columns medium-6">
+										<div className="line-buttons">
+											<Button className="secondary-btn" onClick={() => this.openCommentModal('edit',comment)}>Edit</Button>
+											<Button className="secondary-btn" onClick={() => this.commentDelete(comment.id)}>Delete</Button>
+										</div>
+									</div>
 								</div>
 							</Callout>
 				})}
@@ -235,14 +256,12 @@ class PostPage extends Component {
 				>
 					<h3>Edit this Post</h3>
 					<div onClick={() => this.closeModal()} className="x-button">X</div>
-					<form>
+					<form onSubmit={(e) => this.handlePostSubmit(e)}>
 						<fieldset>
 							<label>Title</label>
 							<input type="text" name="post_title" onChange={(e) => this.postInputChange(e)} value={this.state.postModalTitle} />
 							<label>Body</label>
 							<input type="text" name="post_body" onChange={(e) => this.postInputChange(e)} value={this.state.postModalBody} />
-							<label>Author</label>
-							<input type="text" name="post_author" onChange={(e) => this.postInputChange(e)} value={this.state.postModalAuthor} />
 						</fieldset>
 						<Button className="secondary-btn">Submit</Button>
 					</form>
@@ -283,7 +302,8 @@ function mapActionsToProps(dispatch){
 		postVoteUp:(id,num) => dispatch(voteUp(id,num)),
 		postVoteDown:(id,num) => dispatch(voteDown(id,num)),
 		fetchApi:(bool) => dispatch(fetchingApi(bool)),
-		deleteComment:(id) => dispatch(deleteComment(id))
+		deleteComment:(id) => dispatch(deleteComment(id)),
+		editPost:(post) => dispatch(editPost(post)),
 	}
 }
 

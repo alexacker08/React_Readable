@@ -29,10 +29,9 @@ class App extends Component {
   			if(catArr.indexOf(category) === -1){
   				catArr.push(category)
   			}
+  			this.props.addPost(data[num])
   			postObj[postId] = data[num]
   		})
-
-  		this.props.addPost(postObj)
   		return postObj
   	}).then((data) => {
   		//Gatering all available comments
@@ -49,7 +48,7 @@ class App extends Component {
   		const categories = Object.keys(parseData.categories).map((key) => {
   			return parseData.categories[key].name
   		})
-  		this.props.addCats(categories)
+	  		this.props.addCats(categories)
   	})
   }
   gatherComments(postObj){
@@ -71,18 +70,22 @@ class App extends Component {
 		  	<Router>
 			  	<div className="App-holder">
 				  	<div className="App-header">
-			      		<Link to='/'><h2>This is the beginning of my Comment App</h2></Link>
-			    	</div>
-			    	<div className="container">
-				    	<div className="Categories">
-				    		{categories.map((cat) => {
-				    			return <Link to={`/${cat}`} key={cat}>
-				    						<div className="category">
-				    							<span>{this.capitalize(cat)}</span>
-				    						</div>
-				    					</Link>
-				    		})}
-				    	</div>
+			      		<div className="row">
+			      			<div className="columns medium-6">
+			      				<Link to='/'><h2>Coding Comment App</h2></Link>
+			      			</div>
+			      			<div className="columns medium-6">
+			      				<div className="cat-drop">
+			      					<ul>
+			      						{categories.map((cat) => {
+			      							return <li key={cat}>
+			      										<Link to={`/${cat}`} key={cat}>{this.capitalize(cat)}</Link>
+			      									</li>
+			      						})}
+			      					</ul>
+			      				</div>
+			      			</div>
+			      		</div>
 			    	</div>
 				  	<Route exact path="/:category?" component={ShowPosts}/>
 				  	<Route path="/:category/:postId" component={PostPage} />

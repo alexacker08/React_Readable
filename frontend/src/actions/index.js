@@ -24,10 +24,10 @@ export function addPost(post){
 		post
 	}
 }
-export function editPost(postId){
+export function editPost(post){
 	return {
 		type: EDIT_POST,
-		postId
+		post
 	}
 }
 export function deletePost(postId){
@@ -76,12 +76,10 @@ export function addComment(comment){
 		comment
 	}
 }
-export function editComment({commentId,timestamp,body}){
+export function editComment(comment){
 	return {
 		type: EDIT_COMMENT,
-		commentId,
-		timestamp,
-		body,
+		comment
 	}
 }
 export function deleteComment(commentId){
