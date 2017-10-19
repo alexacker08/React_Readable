@@ -179,6 +179,14 @@ class PostPage extends Component {
 			commentId:''
 		}))
 	}
+	updateTime(unix){
+		const date = new Date(unix)
+		const monthArr = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+		const day = date.getDate()
+		const month = monthArr[date.getMonth()]
+		const year = date.getFullYear()
+		return `${day} ${month} ${year}`
+	}
 
 	render(){
 		return (
@@ -194,7 +202,7 @@ class PostPage extends Component {
 								<p>Title: {indv.title}</p>
 								<p>Body: {indv.body}</p>
 								<p>Author: {indv.author}</p>
-								<p>Date: <Timestamp time={indv.timestamp} format='date' /></p>
+								<p>Date: {this.updateTime(indv.timestamp)}</p>
 								<div className="score-area">
 									<span onClick={() => this.postVoteDown(indv.id,indv.voteScore)}>-</span>
 									<p>{indv.voteScore}</p>
@@ -213,7 +221,7 @@ class PostPage extends Component {
 								<div className="row">
 									<div className="columns medium-6">
 										<p><span className="com-said">{comment.author} said:</span> {comment.body}</p>
-										<p><span className="com-said">Submitted on:</span> <Timestamp time={comment.timestamp} format='date' /></p>
+										<p><span className="com-said">Submitted on:</span> {this.updateTime(comment.timestamp)}</p>
 										<div className="comment-score">
 											<span onClick={() => this.commentDown(comment.id,comment.voteScore)}>-</span>
 											<span>{comment.voteScore}</span>
