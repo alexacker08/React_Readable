@@ -21,10 +21,12 @@ class ShowPosts extends Component {
 			postModalCat:'Select your category',
 			postModalId:'',
 			postModalType:null,
+			filterOption:'likes',
 		}
 		this.openPostModal.bind(this)
 		this.closePostModal.bind(this)
 		this.deletePost.bind(this)
+		this.changeFilter.bind(this)
 	}
 
 	voteUp(id,num){
@@ -81,7 +83,9 @@ class ShowPosts extends Component {
 			this.setState({postModalCat:e.target.value})
 		}
 	}
-
+	changeFilter(e){
+		this.setState({filterOption:e.target.value})
+	}
 	//POST ACTIONS
 	deletePost(id){
 		fetchDeletePost(id).then((res) => {
@@ -131,9 +135,29 @@ class ShowPosts extends Component {
 		return (
 		  	<div className="container">
 		    	<div className="post-container">
-		    		<Button className="primary-btn" onClick={() => this.openPostModal('add')}>Add Post</Button>
-		    		{posts.map((post) => {
-						return 	<div key={post.id} className="post-content">
+		    		<div className="row">
+		    			<div className="columns medium-6">
+			    			<Button className="primary-btn" onClick={() => this.openPostModal('add')}>Add Post</Button>
+			    		</div>
+			    		<div className="columns medium-6">
+				    		<div className="post-filter">
+				    			<select value={this.state.filterOption} onChange={(e) => this.changeFilter(e)}>
+				    				<option value="likes">Number of Likes</option>
+				    				<option value="comments">Number of Comments</option>
+				    			</select>
+				    		</div>
+			    		</div>
+		    		</div>
+		    		{
+		    			posts.sort((postFirst,postSecond) => {
+		    				if(this.state.filterOption === 'likes'){
+		    					return postSecond.voteScore - postFirst.voteScore
+		    				} else {
+		    					return postSecond.numComments - postFirst.numComments
+		    				}
+		    			}).map((post) => {
+		    				return <div key={post.id} className="post-content">
+									<div className="num-comments"><span>{post.numComments}</span></div>
 									<div className="row">
 										<div className="columns medium-6">
 											<Link to={`/${post.category}/${post.id}`}><h2>{post.title}</h2></Link>
@@ -154,7 +178,8 @@ class ShowPosts extends Component {
 										</div>
 									</div>
 								</div>
-					})}
+		    			})
+		    		}
 		    	</div>
 				<Modal
 					isOpen={this.state.postModalOpen}
@@ -195,7 +220,7 @@ function mapStateToProps({posts},thisProps){
 	const paramLength = Object.keys(params).length
 	const paramCat = params.category
 	const collectedPosts = posts.posts
-
+	const collectedComments = posts.comments
 	return {
 		posts: Object.keys(collectedPosts).filter((key) => {
 			if(typeof paramCat !== 'undefined'){
@@ -205,10 +230,17 @@ function mapStateToProps({posts},thisProps){
 			} else if(!collectedPosts[key].deleted){
 				return key
 			}
-		}).sort((postFirst,postSecond) => {
-			return posts.posts[postSecond].voteScore - posts.posts[postFirst].voteScore
 		}).map((id) => {
-			return collectedPosts[id]
+			let indvPost = collectedPosts[id]
+			let commentKeys = Object.keys(collectedComments)
+			let num = 0;
+			commentKeys.forEach((key) => {
+				if(collectedComments[key].parentId === id){
+					num++
+				}
+			})
+			indvPost.numComments = num
+			return indvPost
 		}),
 	}
 }

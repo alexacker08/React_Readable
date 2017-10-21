@@ -22,6 +22,12 @@ select {
   font-size: .9em;
   margin-bottom: 20px;
 }
+.text-center {
+  text-align: center;
+}
+.icon-copy {
+  padding-bottom: 30px;
+}
 
 .primary-btn,.secondary-btn {
   margin-bottom: 30px;
@@ -91,6 +97,11 @@ select {
   margin-left: auto;
   margin-right: auto;
 }
+.App-header img {
+  float: left;
+  width: 60px;
+  padding-top: 5px;
+}
 
 .App-header ul {
   list-style: none;
@@ -99,7 +110,7 @@ select {
 }
 .App-header li {
   display: inline-block;
-  margin-left: 30px;
+  margin-left: 65px;
 }
 .App-header ul li a {
   color: #FFF;
@@ -110,6 +121,8 @@ select {
   width: 100%;
   margin-left: auto;
   margin-right: auto;
+  position: relative;
+  left: 20px;
 }
 .App-intro {
   font-size: large;
@@ -151,8 +164,24 @@ select {
 }
 .post-content {
   padding: 10px 15px;
-  background-color: #ddd;
+  background-color: #F8FAFB;
   border-radius: 3px;
+  position: relative;
+}
+.post-filter {
+  float:right;
+  width: 50%;
+  padding-top: 10px;
+}
+
+.num-comments {
+  padding: 5px 10px;
+  border-radius: 50%;
+  background-color: #1779ba;
+  position: absolute;
+  left: -10px;
+  top: -10px;
+  color: #FFF;
 }
 .post-content:nth-of-type(even){
   background-color: #eee;

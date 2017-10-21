@@ -8,15 +8,15 @@ const fetchObj = {
 	}
 }
 
-export function grabAllPosts(){
+export function fetchAllPosts(){
 	return fetch(`${api}/posts`, fetchObj)
 		.then(res => res.json())
 }
-export function grabCategories(){
+export function fetchCategories(){
 	return fetch(`${api}/categories`, fetchObj)
 		.then(res => res.text())
 }
-export function grabComments(id){
+export function fetchComments(id){
 	return fetch(`${api}/posts/${id}/comments`, fetchObj)
 		.then(res => res.text())
 }

@@ -5,7 +5,7 @@ import Posts from './component/Posts.js';
 import PostPage from './component/PostPage.js';
 import ShowPosts from './component/ShowPosts.js';
 import { addPost,showCats,getComments } from './actions/index.js';
-import { grabAllPosts,grabCategories,grabComments } from './utils/api.js';
+import { fetchAllPosts,fetchCategories,fetchComments } from './utils/api.js';
 import './App.css';
 
 class App extends Component {
@@ -17,7 +17,7 @@ class App extends Component {
   }
   componentDidMount(){
   	//Grabs all posts
-  	grabAllPosts().then((data) => {
+  	fetchAllPosts().then((data) => {
   		let postKeys = Object.keys(data);
   		let postObj = {}
   		let newArr = []
@@ -43,7 +43,7 @@ class App extends Component {
   }
 
   gatherCategories(){
-  	grabCategories().then((data) => {
+  	fetchCategories().then((data) => {
   		const parseData = JSON.parse(data)
   		const categories = Object.keys(parseData.categories).map((key) => {
   			return parseData.categories[key].name
@@ -55,7 +55,7 @@ class App extends Component {
 	//Grabbing Comments
 	const arrOfId = Object.keys(postObj)
 	arrOfId.forEach((id) => {
-		grabComments(id).then((comment) => {
+		fetchComments(id).then((comment) => {
 			let commentParse = JSON.parse(comment)
 			commentParse.forEach((comment) => {
 				this.props.getComments(comment)
@@ -72,6 +72,7 @@ class App extends Component {
 				  	<div className="App-header">
 			      		<div className="row">
 			      			<div className="columns medium-6">
+			      				<img className="header-image" src="/chat.svg" />
 			      				<Link to='/'><h2>Coding Comment App</h2></Link>
 			      			</div>
 			      			<div className="columns medium-6">
