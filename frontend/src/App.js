@@ -67,14 +67,14 @@ class App extends Component {
   }
 
 	render() {
-		const {categories,posts} = this.props
+		const {categories} = this.props
 		return (
 		  	<Router>
 			  	<div className="App-holder">
 				  	<div className="App-header">
 			      		<div className="row">
 			      			<div className="columns medium-6">
-			      				<img className="header-image" src="/chat.svg" />
+			      				<img className="header-image" src="/chat.svg" alt="chat" />
 			      				<Link to='/'><h2>Coding Comment App</h2></Link>
 			      			</div>
 			      			<div className="columns medium-6">

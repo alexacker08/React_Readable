@@ -149,8 +149,9 @@ function posts(state = store, action){
 					}
 				}
 			}
+		default:
+			return state
 	}
-	return state;
 }
 
 export default combineReducers({

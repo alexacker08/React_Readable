@@ -1,13 +1,11 @@
 import React, { Component } from 'react';
-import PostPage from './PostPage.js';
 import { connect } from 'react-redux';
-import { Route, Link} from 'react-router-dom';
+import {Link} from 'react-router-dom';
 import {voteDown,voteUp,editPost,deletePost,addPost} from './../actions/index.js';
 import {voting,fetchDeletePost,fetchAddPost,fetchEditPost} from './../utils/api.js';
 import Modal from 'react-modal';
-import {Callout,Colors,Button} from 'react-foundation';
+import {Button} from 'react-foundation';
 import uuid4 from 'uuid';
-import Timestamp from 'react-timestamp';
 
 class ShowPosts extends Component {
 
@@ -235,8 +233,7 @@ class ShowPosts extends Component {
 }
 
 function mapStateToProps({posts},thisProps){
-	const {path,params} = thisProps.match
-	const paramLength = Object.keys(params).length
+	const {params} = thisProps.match
 	const paramCat = params.category
 	const collectedPosts = posts.posts
 	const collectedComments = posts.comments
