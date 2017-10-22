@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
-import Posts from './component/Posts.js';
 import PostPage from './component/PostPage.js';
 import ShowPosts from './component/ShowPosts.js';
 import { addPost,showCats,getComments } from './actions/index.js';
@@ -18,30 +17,30 @@ class App extends Component {
   componentDidMount(){
   	//Grabs all posts
   	fetchAllPosts().then((data) => {
-  		let postKeys = Object.keys(data);
-  		let postObj = {}
-  		let newArr = []
-  		let catArr = []
-
-  		postKeys.forEach((num) => {
-  			let postId = data[num].id
-  			let category = data[num].category
-  			if(catArr.indexOf(category) === -1){
-  				catArr.push(category)
-  			}
-  			this.props.addPost(data[num])
-  			postObj[postId] = data[num]
-  		})
-  		return postObj
-  	}).then((data) => {
+  		return this.gatherPosts(data)
+  	}).then((postData) => {
   		//Gatering all available comments
-  		this.gatherComments(data)
-  		console.log()
+  		this.gatherComments(postData)
   	}).then(() => {
+  		//Gather all available categories
   		this.gatherCategories()
   	})
   }
 
+  //Fetch all the posts from the API
+  gatherPosts(data){
+		let postKeys = Object.keys(data);
+		let postObj = {}
+
+		postKeys.forEach((num) => {
+			let postId = data[num].id
+			this.props.addPost(data[num])
+			postObj[postId] = data[num]
+		})
+		return postObj
+  }
+
+  //Fetches all Categories from API then updates store
   gatherCategories(){
   	fetchCategories().then((data) => {
   		const parseData = JSON.parse(data)
@@ -51,6 +50,8 @@ class App extends Component {
 	  		this.props.addCats(categories)
   	})
   }
+
+  //Gathers all comments from the API and runs them through the reducer
   gatherComments(postObj){
 	//Grabbing Comments
 	const arrOfId = Object.keys(postObj)

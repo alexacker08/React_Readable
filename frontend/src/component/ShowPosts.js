@@ -15,6 +15,7 @@ class ShowPosts extends Component {
 		super()
 		this.state = {
 			postModalOpen:false,
+			postModalHeader:'',
 			postModalTitle:'',
 			postModalBody:'',
 			postModalAuth:'',
@@ -47,6 +48,7 @@ class ShowPosts extends Component {
 		if(type === 'edit'){
 			this.setState(() => ({
 				postModalOpen:true,
+				postModalHeader:'Edit this post',
 				postModalType:type,
 				postModalTitle:post.title,
 				postModalBody:post.body,
@@ -56,6 +58,7 @@ class ShowPosts extends Component {
 			this.setState(() => ({
 				postModalOpen:true,
 				postModalType:type,
+				postModalHeader:'Add a new post'
 			}))
 		}
 	}
@@ -63,6 +66,7 @@ class ShowPosts extends Component {
 		this.setState(() => ({
 			postModalOpen:false,
 			postModalType:null,
+			postModalHeader:'',
 			postModalTitle:'',
 			postModalBody:'',
 			postModalId:'',
@@ -72,7 +76,6 @@ class ShowPosts extends Component {
 	}
 	postInputChange(e){
 		const postName = e.target.name
-		console.log(e.target.value)
 		if(postName === 'post_title'){
 			this.setState({postModalTitle:e.target.value})
 		} else if(postName === 'post_body'){
@@ -99,6 +102,7 @@ class ShowPosts extends Component {
 		const stamp = Date.now()
 		if(this.state.postModalType === 'add'){
 			const uuid = uuid4();
+			//Builds a new Post to send to the API and the Store
 			const newPost = {
 				id:uuid,
 				timestamp:stamp,
@@ -107,6 +111,7 @@ class ShowPosts extends Component {
 				author:this.state.postModalAuth,
 				category:this.state.postModalCat.toLowerCase(),
 				voteScore:1,
+				numComments:0,
 				deleted:false,
 			}
 			fetchAddPost(newPost).then((res) => {
@@ -144,6 +149,7 @@ class ShowPosts extends Component {
 				    			<select value={this.state.filterOption} onChange={(e) => this.changeFilter(e)}>
 				    				<option value="likes">Number of Likes</option>
 				    				<option value="comments">Number of Comments</option>
+				    				<option value="time">Time posted</option>
 				    			</select>
 				    		</div>
 			    		</div>
@@ -152,8 +158,10 @@ class ShowPosts extends Component {
 		    			posts.sort((postFirst,postSecond) => {
 		    				if(this.state.filterOption === 'likes'){
 		    					return postSecond.voteScore - postFirst.voteScore
-		    				} else {
+		    				} else if(this.state.filterOption === 'comments') {
 		    					return postSecond.numComments - postFirst.numComments
+		    				} else if(this.state.filterOption === 'time'){
+		    					return postSecond.timestamp - postFirst.timestamp
 		    				}
 		    			}).map((post) => {
 		    				return <div key={post.id} className="post-content">
@@ -187,7 +195,7 @@ class ShowPosts extends Component {
 					overlayClassName="modal-overlay"
 					contentLabel="post-edit-modal"
 				>
-					<h3>Edit this Post</h3>
+					<h3>{this.state.postModalHeader}</h3>
 					<div onClick={() => this.closePostModal()} className="x-button">X</div>
 					<form onSubmit={() => this.submitPost()}>
 						<fieldset>
@@ -235,7 +243,8 @@ function mapStateToProps({posts},thisProps){
 			let commentKeys = Object.keys(collectedComments)
 			let num = 0;
 			commentKeys.forEach((key) => {
-				if(collectedComments[key].parentId === id){
+				let indvComment = collectedComments[key]
+				if(indvComment.parentId === id && !indvComment.deleted){
 					num++
 				}
 			})

@@ -1,9 +1,7 @@
 import React, {Component} from 'react';
-import {Route} from 'react-router-dom';
 import { connect } from 'react-redux';
-import Timestamp from 'react-timestamp';
-import { voteDown,voteUp,commentUp,commentDown,getComments,fetchingApi,deleteComment,addComment,editComment,editPost} from './../actions/index.js';
-import {commentVoting,voting,postComment,fetchDeleteComment,fetchEditComment,fetchEditPost} from './../utils/api.js';
+import { voteDown,voteUp,commentUp,commentDown,fetchingApi,deleteComment,addComment,editComment,editPost,deletePost} from './../actions/index.js';
+import {commentVoting,voting,postComment,fetchDeleteComment,fetchEditComment,fetchEditPost,fetchDeletePost} from './../utils/api.js';
 import Modal from 'react-modal';
 import {Callout,Colors,Button} from 'react-foundation';
 import uuid4 from 'uuid';
@@ -30,18 +28,14 @@ class PostPage extends Component {
 	}
 	commentUp(id,num){
 		commentVoting(id,'upVote').then((res) => {
-			return res.ok
-		}).then((pass) => {
-			if(pass){
+			if(res.ok){
 				this.props.commentUp(id,num)
 			}
 		})
 	}
 	commentDown(id,num){
 		commentVoting(id,'downVote').then((res) => {
-			return res.ok
-		}).then((pass) => {
-			if(pass){
+			if(res.ok){
 				this.props.commentDown(id,num)
 			}
 		})
@@ -54,17 +48,24 @@ class PostPage extends Component {
 		})
 	}
 	postVoteUp(id,num){
-		voting(id,'upVote').then((data) => {
-			console.log(data)
-		}).then(() => {
-			this.props.postVoteUp(id,num)
+		voting(id,'upVote').then((res) => {
+			if(res.ok){
+				this.props.postVoteUp(id,num)
+			}
 		})
 	}
 	postVoteDown(id,num){
-		voting(id,'downVote').then((data) => {
-			console.log(data)
-		}).then(() => {
-			this.props.postVoteDown(id,num)
+		voting(id,'downVote').then((res) => {
+			if(res.ok){
+				this.props.postVoteDown(id,num)
+			}
+		})
+	}
+	deletePost(id){
+		fetchDeletePost(id).then((res) => {
+			if(res.ok){
+				this.props.deletePost(id)
+			}
 		})
 	}
 	handleInputChange(event){
@@ -194,7 +195,7 @@ class PostPage extends Component {
 				<div className="post-header">
 					<h2>POST</h2>
 					<Button className="primary-btn" onClick={() => this.openPostModal()}>Edit</Button>
-					<Button className="secondary-btn">Delete</Button>
+					<Button className="secondary-btn" onClick={() => this.deletePost(this.props.post[0].id)}>Delete</Button>
 				</div>
 				<div className="post-content">
 				{this.props.post.map((indv) => {
@@ -283,14 +284,15 @@ function mapStatetoProps({posts},thisProps){
 	const {postId} = thisProps.match.params
 	return {
 		post: Object.keys(posts.posts).filter((pId) => {
-			if(posts.posts[pId].id === postId){
+			if(posts.posts[pId].id === postId && posts.posts[pId].deleted === false){
 				return postId
 			}
 		}).map((id) => {
 			return posts.posts[id]
 		}),
 		comments: Object.keys(posts.comments).filter((comId) => {
-			if(posts.comments[comId].parentId === postId && !posts.comments[comId].deleted){
+			let indvComment = posts.comments[comId]
+			if(indvComment.parentId === postId && !indvComment.deleted && !posts.posts[postId].deleted){
 				return comId
 			}
 		}).sort((commFirst,commSecond) => {
@@ -312,6 +314,7 @@ function mapActionsToProps(dispatch){
 		fetchApi:(bool) => dispatch(fetchingApi(bool)),
 		deleteComment:(id) => dispatch(deleteComment(id)),
 		editPost:(post) => dispatch(editPost(post)),
+		deletePost:(id) => dispatch(deletePost(id)),
 	}
 }
 
