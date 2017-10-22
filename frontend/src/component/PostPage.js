@@ -208,9 +208,9 @@ class PostPage extends Component {
 								<p>Said by {indv.author}</p>
 								<p>Posted at {this.updateTime(indv.timestamp)}</p>
 								<div className="score-area">
-									<span onClick={() => this.postVoteDown(indv.id,indv.voteScore)}>-</span>
+									<span className="thumb-down" onClick={() => this.postVoteDown(indv.id,indv.voteScore)}></span>
 									<p>{indv.voteScore}</p>
-									<span onClick={() => this.postVoteUp(indv.id,indv.voteScore)}>+</span>
+									<span className="thumb-up" onClick={() => this.postVoteUp(indv.id,indv.voteScore)}></span>
 								</div>
 							</div>
 				})}
@@ -227,9 +227,9 @@ class PostPage extends Component {
 										<p><span className="com-said">{comment.author} said:</span> {comment.body}</p>
 										<p><span className="com-said">Submitted on:</span> {this.updateTime(comment.timestamp)}</p>
 										<div className="comment-score">
-											<span onClick={() => this.commentDown(comment.id,comment.voteScore)}>-</span>
+											<span className="thumb-down" onClick={() => this.commentDown(comment.id,comment.voteScore)}></span>
 											<span>{comment.voteScore}</span>
-											<span onClick={() => this.commentUp(comment.id,comment.voteScore)}>+</span>
+											<span className="thumb-up" onClick={() => this.commentUp(comment.id,comment.voteScore)}></span>
 										</div>
 									</div>
 									<div className="columns medium-6">

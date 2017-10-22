@@ -184,9 +184,9 @@ class ShowPosts extends Component {
 											<div className={post.category}></div>
 											<p>{this.updateTime(post.timestamp)}</p>
 											<div className="score-area">
-												<span onClick={() => this.voteDown(post.id,post.voteScore)}>-</span>
+												<span className="thumb-down" onClick={() => this.voteDown(post.id,post.voteScore)}></span>
 												<p>{post.voteScore}</p>
-												<span onClick={() => this.voteUp(post.id,post.voteScore)}>+</span>
+												<span className="thumb-up" onClick={() => this.voteUp(post.id,post.voteScore)}></span>
 											</div>
 										</div>
 										<div className="columns medium-6">

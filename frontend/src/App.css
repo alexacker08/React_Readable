@@ -222,7 +222,7 @@ select {
   margin-left: 10px;
   margin-right: 10px;
 }
-.score-area span,.score-area p {
+.score-area p {
   font-size: 1.4em;
   padding: 5px;
 }
@@ -244,6 +244,22 @@ select {
 }
 .udacity {
   background-image: url(./udacity.png);
+}
+.thumb-up,.thumb-down {
+  padding: 20px;
+  background-position: center center;
+  background-size: 28px;
+  background-repeat: no-repeat;
+  opacity: .4;
+}
+.thumb-down {
+  background-image: url('./thumb-down.svg');
+}
+.thumb-up {
+  background-image: url('./thumb-up.svg');
+}
+.comment-score .thumb-up, .comment-score .thumb-down {
+  background-size: 20px;
 }
 
 /**************** SINGLE POST PAGE *******************/
