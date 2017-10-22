@@ -34,9 +34,10 @@ function posts(state = tempState, action){
 				}
 			}
 		case SHOW_CAT:
-			return Object.assign({}, state, {
+			return {
+				...state,
 				categories: action.cat
-			})
+			}
 		case GET_COMMENTS:
 			return {
 				...state,

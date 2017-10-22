@@ -230,6 +230,21 @@ select {
   cursor: pointer;
 }
 
+.redux,.react,.udacity {
+  padding-top: 15px;
+  padding-bottom: 15px;
+  background-size: 100px;
+  background-repeat: no-repeat;
+}
+.redux {
+  background-image: url(./redux.png);
+}
+.react {
+  background-image: url(./react.png);
+}
+.udacity {
+  background-image: url(./udacity.png);
+}
 
 /**************** SINGLE POST PAGE *******************/
 
@@ -237,6 +252,10 @@ select {
   width: 75%;
   margin-left: auto;
   margin-right: auto;
+}
+
+.post-header {
+  padding-top: 30px;
 }
 
 .post-header button {

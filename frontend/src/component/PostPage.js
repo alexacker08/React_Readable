@@ -186,24 +186,27 @@ class PostPage extends Component {
 		const day = date.getDate()
 		const month = monthArr[date.getMonth()]
 		const year = date.getFullYear()
-		return `${day} ${month} ${year}`
+		const hour = date.getHours() > 12 ? date.getHours() - 12 : date.getHours()
+		const minute = date.getMinutes()
+		const ampm = date.getHours() > 11 ? 'PM' : 'AM'
+		return `${hour}:${minute} ${ampm} - ${day} ${month} ${year}`
 	}
 
 	render(){
+		const modalType = this.state.commentModalType === 'edit' ? 'hide' : 'active'
 		return (
 			<div className="post-page">
 				<div className="post-header">
-					<h2>POST</h2>
 					<Button className="primary-btn" onClick={() => this.openPostModal()}>Edit</Button>
 					<Button className="secondary-btn" onClick={() => this.deletePost(this.props.post[0].id)}>Delete</Button>
 				</div>
 				<div className="post-content">
 				{this.props.post.map((indv) => {
 					return <div key={indv.id} className="post-area">
-								<p>Title: {indv.title}</p>
-								<p>Body: {indv.body}</p>
-								<p>Author: {indv.author}</p>
-								<p>Date: {this.updateTime(indv.timestamp)}</p>
+								<h2>{indv.title}</h2>
+								<h4>{indv.body}</h4>
+								<p>Said by {indv.author}</p>
+								<p>Posted at {this.updateTime(indv.timestamp)}</p>
 								<div className="score-area">
 									<span onClick={() => this.postVoteDown(indv.id,indv.voteScore)}>-</span>
 									<p>{indv.voteScore}</p>
@@ -251,8 +254,10 @@ class PostPage extends Component {
 						<fieldset>
 							<label>Comment</label>
 							<textarea name="comment_field" value={this.state.commentContent} onChange={(e) => this.handleInputChange(e)} />
-							<label>Author</label>
-							<input type="text" name="author_field" value={this.state.commentAuthor} onChange={(e) => this.handleInputChange(e)} />
+							<div className={modalType}>
+								<label>Author</label>
+								<input type="text" name="author_field" value={this.state.commentAuthor} onChange={(e) => this.handleInputChange(e)} />
+							</div>
 						</fieldset>
 						<Button className="secondary-btn">Submit</Button>
 					</form>
