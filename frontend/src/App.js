@@ -14,8 +14,9 @@ class App extends Component {
 	    ? ''
 	    : str[0].toUpperCase() + str.slice(1)
   }
-  componentDidMount(){
-  	//Grabs all posts
+  componentWillMount(){
+  	//Start with the initial API request of getting all the posts
+  	//This then creates a Promise chain which then enables other API grabs including all of the comments and categories available
   	fetchAllPosts().then((data) => {
   		return this.gatherPosts(data)
   	}).then((postData) => {
