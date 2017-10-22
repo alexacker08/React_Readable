@@ -1,10 +1,10 @@
-# Readable API Server
+# Readable Project
 
-This is the starter project for the final assessment project for Udacity's Redux course where you will build a content and comment web app. Users will be able to post content to predefined categories, comment on their posts and other users' posts, and vote on posts and comments. Users will also be able to edit and delete posts and comments.
+This is my Readable React + Redux project for Udacity's React NanoDegree. The particular project encompasses a "Comment" type application which is managed by Redux in part with React. The application also utilizes an Express Backend server which act as the application End Point API. This API doesn't pull from a database and relies more on the users localStorage in their browser.
 
-This repository includes the code for the backend API Server that you'll use to develop and interact with the front-end portion of the project.
+The Application has several features split between Posts and Comments. Seeing as the application doesn't pull from a 3rd party, all of the data represented is siloed for the individual user thus control and administrative access is wide open. This give each user the ability to create, delete, edit, and vote on each comment and post within the application. Each particular Post is given its own designated page which lists out comments while each category for the application is also given its own page.
 
-## Start Developing
+## How to get started Developing
 
 To get started developing right away:
 
