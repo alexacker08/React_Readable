@@ -187,7 +187,7 @@ class PostPage extends Component {
 		const month = monthArr[date.getMonth()]
 		const year = date.getFullYear()
 		const hour = date.getHours() > 12 ? date.getHours() - 12 : date.getHours()
-		const minute = date.getMinutes()
+		const minute = date.getMinutes() < 10 ? date.getMinutes().toString().split('').concat('0').reverse().join('') : date.getMinutes()
 		const ampm = date.getHours() > 11 ? 'PM' : 'AM'
 		return `${hour}:${minute} ${ampm} - ${day} ${month} ${year}`
 	}

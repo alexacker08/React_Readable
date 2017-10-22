@@ -15,15 +15,14 @@ import {
 } from './../actions/index.js';
 import {combineReducers} from 'redux';
 
-const tempState = {
+const store = {
 	categories: {},
 	posts: {},
 	comments:{},
 	fetchingAPI:false,
 }
 
-
-function posts(state = tempState, action){
+function posts(state = store, action){
 	switch(action.type){
 		case ADD_POST:
 			return {
