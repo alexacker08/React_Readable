@@ -6,17 +6,24 @@ The Application has several features split between Posts and Comments. Seeing as
 
 ## How to get started Developing
 
-To get started developing right away:
+There are two parts in which to split up to get the app running on your local machine. I've broken those out below.
 
-* Install and start the API server
-    - `cd api-server`
+## Install the App
+```sh
+    - `https://github.com/alexnitro/React_Readable.git`
     - `npm install`
-    - `node server`
-* In another terminal window, use Create React App to scaffold out the front-end
-    - `create-react-app frontend`
-    - `cd frontend`
-    - `npm start`
+```
+## Bootup the Node Server
+```sh
+	- `cd api-server`
+	- `node server`
+```
+## Bootup the App
+```sh
+	- `cd ../frontend`
+	- `npm start`
+```
+
 
 ## API Server
-
 Information about the API server and how to use it can be found in its [README file](api-server/README.md).
