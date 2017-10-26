@@ -8,21 +8,28 @@ The Application has several features split between Posts and Comments. Seeing as
 
 There are two parts in which to split up to get the app running on your local machine. I've broken those out below. If you follow these steps exactly. From file to file, everything should start up correctly :+1:
 
-## Install the App
+## Clone the App & Install Initial Dependencies
 ```sh
 https://github.com/alexnitro/React_Readable.git
 
+cd React_Redable
+
 npm install
+
 ```
-## Bootup the Node Server
+## Install Server Dependencies & Start the Node Server
 ```sh
-cd api-server
+cd React_Readable/api-server
+
+npm install
 
 node server
 ```
-## Bootup the App
+## Install the App Dependencies & Start the App
 ```sh
-cd ../frontend
+cd React_Readable/frontend
+
+npm install
 
 npm start
 ```

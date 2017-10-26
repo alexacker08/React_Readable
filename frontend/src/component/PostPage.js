@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import { connect } from 'react-redux';
-import { voteDown,voteUp,commentUp,commentDown,fetchingApi,deleteComment,addComment,editComment,editPost,deletePost} from './../actions/index.js';
-import {commentVoting,voting,postComment,fetchDeleteComment,fetchEditComment,fetchEditPost,fetchDeletePost} from './../utils/api.js';
+import { voteDown,voteUp,commentVote,deleteComment,addingComment,editComment,editPost,deletePost,postVote} from './../actions/index.js';
+import {commentVoting,postComment,fetchDeleteComment,fetchEditComment,fetchEditPost,fetchDeletePost} from './../utils/api.js';
 import Modal from 'react-modal';
 import {Callout,Colors,Button} from 'react-foundation';
 import uuid4 from 'uuid';
@@ -26,38 +26,10 @@ class PostPage extends Component {
 		this.handleSubmit.bind(this)
 		this.handlePostSubmit.bind(this)
 	}
-	commentUp(id,num){
-		commentVoting(id,'upVote').then((res) => {
-			if(res.ok){
-				this.props.commentUp(id,num)
-			}
-		})
-	}
-	commentDown(id,num){
-		commentVoting(id,'downVote').then((res) => {
-			if(res.ok){
-				this.props.commentDown(id,num)
-			}
-		})
-	}
 	commentDelete(id){
 		fetchDeleteComment(id).then((res) => {
 			if(res.ok){
 				this.props.deleteComment(id)
-			}
-		})
-	}
-	postVoteUp(id,num){
-		voting(id,'upVote').then((res) => {
-			if(res.ok){
-				this.props.postVoteUp(id,num)
-			}
-		})
-	}
-	postVoteDown(id,num){
-		voting(id,'downVote').then((res) => {
-			if(res.ok){
-				this.props.postVoteDown(id,num)
 			}
 		})
 	}
@@ -102,15 +74,8 @@ class PostPage extends Component {
 				deleted: false,
 				parentDeleted: false
 			}
-			postComment(commentObj).then((res) => {
-				if(res.ok){
-					this.props.fetchApi(res.ok)
-				}
-			}).then((pass) => {
-					this.closeModal()
-					this.props.addComment(commentObj)
-					this.props.fetchApi(false)
-			})
+			this.props.dispatch(addingComment(commentObj))
+			this.closeModal()
 		} else if(this.state.commentModalType === 'edit'){
 			const editObj = {
 				id: this.state.commentId,
@@ -119,11 +84,9 @@ class PostPage extends Component {
 			}
 			fetchEditComment(editObj).then((res) => {
 				if(res.ok){
-				 this.props.fetchApi(res.ok)
+					this.closeModal()
+					this.props.editComment(editObj)
 				}
-			}).then(() => {
-				this.closeModal()
-				this.props.editComment(editObj)
 			})
 		}
 	}
@@ -204,14 +167,15 @@ class PostPage extends Component {
 				<div className="post-content">
 				{this.props.post.map((indv) => {
 					return <div key={indv.id} className="post-area">
+								<div className="num-comments"><span>{indv.numComments}</span></div>
 								<h2>{indv.title}</h2>
 								<h4>{indv.body}</h4>
 								<p>Said by {indv.author}</p>
 								<p>Posted at {this.updateTime(indv.timestamp)}</p>
 								<div className="score-area">
-									<span className="thumb-down" onClick={() => this.postVoteDown(indv.id,indv.voteScore)}></span>
+									<span className="thumb-down" onClick={() => this.props.dispatch(postVote(indv.id,'downVote'))}></span>
 									<p>{indv.voteScore}</p>
-									<span className="thumb-up" onClick={() => this.postVoteUp(indv.id,indv.voteScore)}></span>
+									<span className="thumb-up" onClick={() => this.props.dispatch(postVote(indv.id,'upVote'))}></span>
 								</div>
 							</div>
 				})}
@@ -221,16 +185,16 @@ class PostPage extends Component {
 				</div>
 				<div className="comment-content">
 					<Button onClick={() => this.openCommentModal('add')} className="primary-btn" color={Colors.PRIMARY}>Add a Comment</Button>
-				{this.props.comments.map((comment) => {
+				{this.props.allComments.map((comment) => {
 					return <Callout color={Colors.PRIMARY} key={comment.id} className="single-comment">
 								<div className="row">
 									<div className="columns medium-6">
 										<p><span className="com-said">{comment.author} said:</span> {comment.body}</p>
 										<p><span className="com-said">Submitted on:</span> {this.updateTime(comment.timestamp)}</p>
 										<div className="comment-score">
-											<span className="thumb-down" onClick={() => this.commentDown(comment.id,comment.voteScore)}></span>
+											<span className="thumb-down" onClick={() => this.props.dispatch(commentVote(comment.id,'downVote'))}></span>
 											<span>{comment.voteScore}</span>
-											<span className="thumb-up" onClick={() => this.commentUp(comment.id,comment.voteScore)}></span>
+											<span className="thumb-up" onClick={() => this.props.dispatch(commentVote(comment.id,'upVote'))}></span>
 										</div>
 									</div>
 									<div className="columns medium-6">
@@ -286,41 +250,48 @@ class PostPage extends Component {
 	}
 }
 
-function mapStatetoProps({posts},thisProps){
+function mapStatetoProps({posts,comments},thisProps){
 	const {postId} = thisProps.match.params
+	const collectedPosts = posts.posts || []
+	const collectedComments = comments.allComments || []
 	return {
-		post: Object.keys(posts.posts).filter((pId) => {
+		post: Object.keys(collectedPosts).filter((pId) => {
 			if(posts.posts[pId].id === postId && posts.posts[pId].deleted === false){
 				return postId
 			}
 		}).map((id) => {
-			return posts.posts[id]
+			let indvPost = collectedPosts[id]
+			let commentKeys = Object.keys(collectedComments)
+			let num = 0;
+			commentKeys.forEach((key) => {
+				let indvComment = collectedComments[key]
+				if(indvComment.parentId === id && !indvComment.deleted){
+					num++
+				}
+			})
+			indvPost.numComments = num
+			return indvPost
 		}),
-		comments: Object.keys(posts.comments).filter((comId) => {
-			let indvComment = posts.comments[comId]
+		allComments: Object.keys(collectedComments).filter((comId) => {
+			let indvComment = collectedComments[comId]
 			if(indvComment.parentId === postId && !indvComment.deleted && !posts.posts[postId].deleted){
 				return comId
 			}
 		}).sort((commFirst,commSecond) => {
-			return posts.comments[commSecond].voteScore - posts.comments[commFirst].voteScore
+			return collectedComments[commSecond].voteScore - collectedComments[commFirst].voteScore
 		}).map((id) => {
-			return posts.comments[id]
+			return collectedComments[id]
 		}),
 	}
 }
 
 function mapActionsToProps(dispatch){
 	return {
-		commentUp:(id,num) => dispatch(commentUp(id,num)),
-		commentDown:(id,num) => dispatch(commentDown(id,num)),
-		addComment:(data) => dispatch(addComment(data)),
 		editComment:(data) => dispatch(editComment(data)),
-		postVoteUp:(id,num) => dispatch(voteUp(id,num)),
-		postVoteDown:(id,num) => dispatch(voteDown(id,num)),
-		fetchApi:(bool) => dispatch(fetchingApi(bool)),
 		deleteComment:(id) => dispatch(deleteComment(id)),
 		editPost:(post) => dispatch(editPost(post)),
 		deletePost:(id) => dispatch(deletePost(id)),
+		dispatch:dispatch
 	}
 }
 

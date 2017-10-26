@@ -20,7 +20,7 @@ export function fetchComments(id){
 	return fetch(`${api}/posts/${id}/comments`, fetchObj)
 		.then(res => res.text())
 }
-export function voting(id,voteType){
+export function postVoting(id,voteType){
 	return fetch(`${api}/posts/${id}`,{
 		method:'POST',
 		headers:{
@@ -42,7 +42,7 @@ export function commentVoting(id,voteType){
 		body:JSON.stringify({
 			option:voteType
 		})
-	})
+	}).then(res => res.text())
 }
 export function postComment({id,timestamp,body,author,parentId}){
 	return fetch(`${api}/comments`,{

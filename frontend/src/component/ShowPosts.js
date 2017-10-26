@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {Link} from 'react-router-dom';
-import {voteDown,voteUp,editPost,deletePost,addPost} from './../actions/index.js';
-import {voting,fetchDeletePost,fetchAddPost,fetchEditPost} from './../utils/api.js';
+import {voteDown,voteUp,editPost,deletePost,addPost,postVote} from './../actions/index.js';
+import {fetchDeletePost,fetchAddPost,fetchEditPost} from './../utils/api.js';
 import Modal from 'react-modal';
 import {Button} from 'react-foundation';
 import uuid4 from 'uuid';
@@ -26,21 +26,6 @@ class ShowPosts extends Component {
 		this.closePostModal.bind(this)
 		this.deletePost.bind(this)
 		this.changeFilter.bind(this)
-	}
-
-	voteUp(id,num){
-		voting(id,'upVote').then((data) => {
-
-		}).then(() => {
-			this.props.voteUp(id,num)
-		})
-	}
-	voteDown(id,num){
-		voting(id,'downVote').then((data) => {
-
-		}).then(() => {
-			this.props.voteDown(id,num)
-		})
 	}
 	openPostModal(type,post){
 		if(type === 'edit'){
@@ -182,9 +167,9 @@ class ShowPosts extends Component {
 											<div className={post.category}></div>
 											<p>{this.updateTime(post.timestamp)}</p>
 											<div className="score-area">
-												<span className="thumb-down" onClick={() => this.voteDown(post.id,post.voteScore)}></span>
+												<span className="thumb-down" onClick={() => this.props.dispatch(postVote(post.id,'downVote'))}></span>
 												<p>{post.voteScore}</p>
-												<span className="thumb-up" onClick={() => this.voteUp(post.id,post.voteScore)}></span>
+												<span className="thumb-up" onClick={() => this.props.dispatch(postVote(post.id,'upVote'))}></span>
 											</div>
 										</div>
 										<div className="columns medium-6">
@@ -232,11 +217,11 @@ class ShowPosts extends Component {
 	}
 }
 
-function mapStateToProps({posts},thisProps){
+function mapStateToProps({posts,comments},thisProps){
 	const {params} = thisProps.match
 	const paramCat = params.category
-	const collectedPosts = posts.posts
-	const collectedComments = posts.comments
+	const collectedPosts = posts.posts || []
+	const collectedComments = comments.allComments || []
 	return {
 		posts: Object.keys(collectedPosts).filter((key) => {
 			if(typeof paramCat !== 'undefined'){
@@ -263,11 +248,10 @@ function mapStateToProps({posts},thisProps){
 }
 function mapActionsToProps(dispatch){
 	return {
-		voteUp:(id,num) => dispatch(voteUp(id,num)),
-		voteDown:(id,num) => dispatch(voteDown(id,num)),
 		deletePost:(id) => dispatch(deletePost(id)),
 		addPost:(post) => dispatch(addPost(post)),
 		editPost:(post) => dispatch(editPost(post)),
+		dispatch:dispatch
 	}
 }
 

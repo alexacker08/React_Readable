@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 import PostPage from './component/PostPage.js';
 import ShowPosts from './component/ShowPosts.js';
-import { addPost,showCats,getComments } from './actions/index.js';
+import { addPost,showCats,getComments,fetchApp } from './actions/index.js';
 import { fetchAllPosts,fetchCategories,fetchComments } from './utils/api.js';
 import './App.css';
 
@@ -17,28 +17,8 @@ class App extends Component {
   componentWillMount(){
   	//Start with the initial API request of getting all the posts
   	//This then creates a Promise chain which then enables other API grabs including all of the comments and categories available
-  	fetchAllPosts().then((data) => {
-  		return this.gatherPosts(data)
-  	}).then((postData) => {
-  		//Gatering all available comments
-  		this.gatherComments(postData)
-  	}).then(() => {
-  		//Gather all available categories
-  		this.gatherCategories()
-  	})
-  }
-
-  //Fetch all the posts from the API
-  gatherPosts(data){
-		let postKeys = Object.keys(data);
-		let postObj = {}
-
-		postKeys.forEach((num) => {
-			let postId = data[num].id
-			this.props.addPost(data[num])
-			postObj[postId] = data[num]
-		})
-		return postObj
+  	this.props.dispatch(fetchApp())
+  	this.gatherCategories()
   }
 
   //Fetches all Categories from API then updates store
@@ -50,20 +30,6 @@ class App extends Component {
   		})
 	  		this.props.addCats(categories)
   	})
-  }
-
-  //Gathers all comments from the API and runs them through the reducer
-  gatherComments(postObj){
-	//Grabbing Comments
-	const arrOfId = Object.keys(postObj)
-	arrOfId.forEach((id) => {
-		fetchComments(id).then((comment) => {
-			let commentParse = JSON.parse(comment)
-			commentParse.forEach((comment) => {
-				this.props.getComments(comment)
-			})
-		})
-	})
   }
 
 	render() {
@@ -98,12 +64,10 @@ class App extends Component {
 	}
 }
 
-function mapStateToProps({posts}){
-	//console.log(posts)
+function mapStateToProps({posts,category}){
+	const catTypes = category.catType || []
 	return {
-		categories: Object.keys(posts.categories).map((cat) => {
-			return posts.categories[cat]
-		})
+		categories: catTypes
 	}
 }
 function mapActionsToProps(dispatch){
@@ -111,6 +75,7 @@ function mapActionsToProps(dispatch){
 		addPost:(data) => dispatch(addPost(data)),
 		addCats:(data) => dispatch(showCats(data)),
 		getComments:(data) => dispatch(getComments(data)),
+		dispatch:dispatch
 	}
 }
 
