@@ -153,6 +153,8 @@ export function commentVote(id,dir){
 			let comObj = JSON.parse(res)
 			let newNum = comObj.voteScore
 			dispatch(commentVoteChange(id,newNum))
+		}).catch((err) => {
+			console.log('fetch err: ' + err.message)
 		})
 	}
 }
@@ -162,6 +164,8 @@ export function postVote(id,dir){
 			let postObj = JSON.parse(res)
 			let newNum = postObj.voteScore
 			dispatch(postVoteChange(id,newNum))
+		}).catch((err) => {
+			console.log('fetch err: ' + err.message)
 		})
 	}
 }
