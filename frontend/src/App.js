@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 import PostPage from './component/PostPage.js';
 import ShowPosts from './component/ShowPosts.js';
 import { addPost,showCats,getComments,fetchApp } from './actions/index.js';
-import { fetchAllPosts,fetchCategories,fetchComments } from './utils/api.js';
+import { fetchCategories } from './utils/api.js';
 import './App.css';
 
 class App extends Component {

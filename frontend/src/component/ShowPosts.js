@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {Link} from 'react-router-dom';
-import {voteDown,voteUp,editPost,deletePost,addPost,postVote} from './../actions/index.js';
+import {editPost,deletePost,addPost,postVote} from './../actions/index.js';
 import {fetchDeletePost,fetchAddPost,fetchEditPost} from './../utils/api.js';
 import Modal from 'react-modal';
 import {Button} from 'react-foundation';
@@ -20,7 +20,7 @@ class ShowPosts extends Component {
 			postModalCat:'Select your category',
 			postModalId:'',
 			postModalType:null,
-			filterOption:'likes',
+			filterOption:'voteScore',
 		}
 		this.openPostModal.bind(this)
 		this.closePostModal.bind(this)
@@ -131,6 +131,7 @@ class ShowPosts extends Component {
 	render(){
 		const {posts} = this.props
 		const modalType = this.state.postModalType === 'edit' ? 'hide' : 'active';
+		const {filterOption} = this.state
 		return (
 		  	<div className="container">
 		    	<div className="post-container">
@@ -141,22 +142,16 @@ class ShowPosts extends Component {
 			    		<div className="columns medium-6">
 				    		<div className="post-filter">
 				    			<select value={this.state.filterOption} onChange={(e) => this.changeFilter(e)}>
-				    				<option value="likes">Number of Likes</option>
-				    				<option value="comments">Number of Comments</option>
-				    				<option value="time">Time posted</option>
+				    				<option value="voteScore">Number of Likes</option>
+				    				<option value="numComments">Number of Comments</option>
+				    				<option value="timestamp">Time posted</option>
 				    			</select>
 				    		</div>
 			    		</div>
 		    		</div>
 		    		{
 		    			posts.sort((postFirst,postSecond) => {
-		    				if(this.state.filterOption === 'likes'){
-		    					return postSecond.voteScore - postFirst.voteScore
-		    				} else if(this.state.filterOption === 'comments') {
-		    					return postSecond.numComments - postFirst.numComments
-		    				} else if(this.state.filterOption === 'time'){
-		    					return postSecond.timestamp - postFirst.timestamp
-		    				}
+		    				return postSecond[filterOption] - postFirst[filterOption]
 		    			}).map((post) => {
 		    				return <div key={post.id} className="post-content">
 									<div className="num-comments"><span>{post.numComments}</span></div>
@@ -171,6 +166,7 @@ class ShowPosts extends Component {
 												<p>{post.voteScore}</p>
 												<span className="thumb-up" onClick={() => this.props.dispatch(postVote(post.id,'upVote'))}></span>
 											</div>
+											<p>Number of Comments: {post.numComments}</p>
 										</div>
 										<div className="columns medium-6">
 											<div className="line-buttons">

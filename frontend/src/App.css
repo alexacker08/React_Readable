@@ -304,7 +304,6 @@ select {
   color: #537C8D;
 }
 
-
 /******************** MODAL DESIGN *************************/
 
 .modal-overlay {
@@ -386,8 +385,24 @@ select {
   float:right;
 }
 
+/******************** ERROR DESIGN *************************/
 
+.error-container {
+  padding-top: 50px;
+  padding-bottom: 50px;
+  min-height: 400px;
+}
 
-
+.error-container h3 {
+  font-size: 3em
+}
+.error-container p {
+  font-size: 1.5em;
+}
+.error-container .crying-image {
+  height: 140px;
+  background-image: url(./crying.png);
+  background-repeat: no-repeat;
+}
 
 

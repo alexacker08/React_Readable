@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
 import { connect } from 'react-redux';
-import { voteDown,voteUp,commentVote,deleteComment,addingComment,editComment,editPost,deletePost,postVote} from './../actions/index.js';
-import {commentVoting,postComment,fetchDeleteComment,fetchEditComment,fetchEditPost,fetchDeletePost} from './../utils/api.js';
+import { commentVote,deleteComment,addingComment,editComment,editPost,deletePost,postVote} from './../actions/index.js';
+import {fetchDeleteComment,fetchEditComment,fetchEditPost,fetchDeletePost} from './../utils/api.js';
+import ErrorComp from './404.js';
 import Modal from 'react-modal';
 import {Callout,Colors,Button} from 'react-foundation';
 import uuid4 from 'uuid';
@@ -20,7 +21,7 @@ class PostPage extends Component {
 			postModalOpen: false,
 			postModalTitle:'',
 			postModalBody:'',
-			postModalAuthor:''
+			postModalAuthor:'',
 		}
 		this.handleInputChange.bind(this)
 		this.handleSubmit.bind(this)
@@ -160,91 +161,96 @@ class PostPage extends Component {
 		const modalType = this.state.commentModalType === 'edit' ? 'hide' : 'active'
 		return (
 			<div className="post-page">
-				<div className="post-header">
-					<Button className="primary-btn" onClick={() => this.openPostModal()}>Edit</Button>
-					<Button className="secondary-btn" onClick={() => this.deletePost(this.props.post[0].id)}>Delete</Button>
-				</div>
-				<div className="post-content">
-				{this.props.post.map((indv) => {
-					return <div key={indv.id} className="post-area">
-								<div className="num-comments"><span>{indv.numComments}</span></div>
-								<h2>{indv.title}</h2>
-								<h4>{indv.body}</h4>
-								<p>Said by {indv.author}</p>
-								<p>Posted at {this.updateTime(indv.timestamp)}</p>
-								<div className="score-area">
-									<span className="thumb-down" onClick={() => this.props.dispatch(postVote(indv.id,'downVote'))}></span>
-									<p>{indv.voteScore}</p>
-									<span className="thumb-up" onClick={() => this.props.dispatch(postVote(indv.id,'upVote'))}></span>
-								</div>
-							</div>
-				})}
-				</div>
-				<div className="comment-header">
-					<h2>COMMENTS</h2>
-				</div>
-				<div className="comment-content">
-					<Button onClick={() => this.openCommentModal('add')} className="primary-btn" color={Colors.PRIMARY}>Add a Comment</Button>
-				{this.props.allComments.map((comment) => {
-					return <Callout color={Colors.PRIMARY} key={comment.id} className="single-comment">
-								<div className="row">
-									<div className="columns medium-6">
-										<p><span className="com-said">{comment.author} said:</span> {comment.body}</p>
-										<p><span className="com-said">Submitted on:</span> {this.updateTime(comment.timestamp)}</p>
-										<div className="comment-score">
-											<span className="thumb-down" onClick={() => this.props.dispatch(commentVote(comment.id,'downVote'))}></span>
-											<span>{comment.voteScore}</span>
-											<span className="thumb-up" onClick={() => this.props.dispatch(commentVote(comment.id,'upVote'))}></span>
-										</div>
-									</div>
-									<div className="columns medium-6">
-										<div className="line-buttons">
-											<Button className="secondary-btn" onClick={() => this.openCommentModal('edit',comment)}>Edit</Button>
-											<Button className="secondary-btn" onClick={() => this.commentDelete(comment.id)}>Delete</Button>
-										</div>
+				{this.props.post.length > 0 ?
+				<div className="post-holder">
+					<div className="post-header">
+						<Button className="primary-btn" onClick={() => this.openPostModal()}>Edit</Button>
+						<Button className="secondary-btn" onClick={() => this.deletePost(this.props.post[0].id)}>Delete</Button>
+					</div>
+					<div className="post-content">
+					{this.props.post.map((indv) => {
+						return <div key={indv.id} className="post-area">
+									<div className="num-comments"><span>{indv.numComments}</span></div>
+									<h2>{indv.title}</h2>
+									<h4>{indv.body}</h4>
+									<p>Said by {indv.author}</p>
+									<p>Posted at {this.updateTime(indv.timestamp)}</p>
+									<div className="score-area">
+										<span className="thumb-down" onClick={() => this.props.dispatch(postVote(indv.id,'downVote'))}></span>
+										<p>{indv.voteScore}</p>
+										<span className="thumb-up" onClick={() => this.props.dispatch(postVote(indv.id,'upVote'))}></span>
 									</div>
 								</div>
-							</Callout>
-				})}
+					})}
+					</div>
+					<div className="comment-header">
+						<h2>COMMENTS</h2>
+					</div>
+					<div className="comment-content">
+						<Button onClick={() => this.openCommentModal('add')} className="primary-btn" color={Colors.PRIMARY}>Add a Comment</Button>
+					{this.props.allComments.map((comment) => {
+						return <Callout color={Colors.PRIMARY} key={comment.id} className="single-comment">
+									<div className="row">
+										<div className="columns medium-6">
+											<p><span className="com-said">{comment.author} said:</span> {comment.body}</p>
+											<p><span className="com-said">Submitted on:</span> {this.updateTime(comment.timestamp)}</p>
+											<div className="comment-score">
+												<span className="thumb-down" onClick={() => this.props.dispatch(commentVote(comment.id,'downVote'))}></span>
+												<span>{comment.voteScore}</span>
+												<span className="thumb-up" onClick={() => this.props.dispatch(commentVote(comment.id,'upVote'))}></span>
+											</div>
+										</div>
+										<div className="columns medium-6">
+											<div className="line-buttons">
+												<Button className="secondary-btn" onClick={() => this.openCommentModal('edit',comment)}>Edit</Button>
+												<Button className="secondary-btn" onClick={() => this.commentDelete(comment.id)}>Delete</Button>
+											</div>
+										</div>
+									</div>
+								</Callout>
+					})}
+					</div>
+					<Modal
+						isOpen={this.state.commentModalOpen}
+						className="modal-design"
+						overlayClassName="modal-overlay"
+						contentLabel="comment-edit-modal"
+					>
+						<h3>{this.state.commentHeader}</h3>
+						<div onClick={() => this.closeModal()} className="x-button">X</div>
+						<form onSubmit={(e) => this.handleSubmit(e)}>
+							<fieldset>
+								<label>Comment</label>
+								<textarea name="comment_field" value={this.state.commentContent} onChange={(e) => this.handleInputChange(e)} />
+								<div className={modalType}>
+									<label>Author</label>
+									<input type="text" name="author_field" value={this.state.commentAuthor} onChange={(e) => this.handleInputChange(e)} />
+								</div>
+							</fieldset>
+							<Button className="secondary-btn">Submit</Button>
+						</form>
+					</Modal>
+					<Modal
+						isOpen={this.state.postModalOpen}
+						className="modal-design"
+						overlayClassName="modal-overlay"
+						contentLabel="post-edit-modal"
+					>
+						<h3>Edit this Post</h3>
+						<div onClick={() => this.closeModal()} className="x-button">X</div>
+						<form onSubmit={(e) => this.handlePostSubmit(e)}>
+							<fieldset>
+								<label>Title</label>
+								<input type="text" name="post_title" onChange={(e) => this.postInputChange(e)} value={this.state.postModalTitle} />
+								<label>Body</label>
+								<input type="text" name="post_body" onChange={(e) => this.postInputChange(e)} value={this.state.postModalBody} />
+							</fieldset>
+							<Button className="secondary-btn">Submit</Button>
+						</form>
+					</Modal>
 				</div>
-				<Modal
-					isOpen={this.state.commentModalOpen}
-					className="modal-design"
-					overlayClassName="modal-overlay"
-					contentLabel="comment-edit-modal"
-				>
-					<h3>{this.state.commentHeader}</h3>
-					<div onClick={() => this.closeModal()} className="x-button">X</div>
-					<form onSubmit={(e) => this.handleSubmit(e)}>
-						<fieldset>
-							<label>Comment</label>
-							<textarea name="comment_field" value={this.state.commentContent} onChange={(e) => this.handleInputChange(e)} />
-							<div className={modalType}>
-								<label>Author</label>
-								<input type="text" name="author_field" value={this.state.commentAuthor} onChange={(e) => this.handleInputChange(e)} />
-							</div>
-						</fieldset>
-						<Button className="secondary-btn">Submit</Button>
-					</form>
-				</Modal>
-				<Modal
-					isOpen={this.state.postModalOpen}
-					className="modal-design"
-					overlayClassName="modal-overlay"
-					contentLabel="post-edit-modal"
-				>
-					<h3>Edit this Post</h3>
-					<div onClick={() => this.closeModal()} className="x-button">X</div>
-					<form onSubmit={(e) => this.handlePostSubmit(e)}>
-						<fieldset>
-							<label>Title</label>
-							<input type="text" name="post_title" onChange={(e) => this.postInputChange(e)} value={this.state.postModalTitle} />
-							<label>Body</label>
-							<input type="text" name="post_body" onChange={(e) => this.postInputChange(e)} value={this.state.postModalBody} />
-						</fieldset>
-						<Button className="secondary-btn">Submit</Button>
-					</form>
-				</Modal>
+				: <ErrorComp/>
+				}
 			</div>
 		)
 	}
