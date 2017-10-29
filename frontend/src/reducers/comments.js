@@ -21,7 +21,6 @@ export default function comments(state = commentStore, action){
 				allComments:{
 					...state.allComments,
 					[action.comment.id]:action.comment,
-					retrieving:action.retrieving
 				}
 			}
 		case COMMENT_VOTE_CHANGE:
