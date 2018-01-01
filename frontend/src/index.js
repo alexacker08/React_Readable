@@ -12,7 +12,7 @@ const middleWare = applyMiddleware(thunk)
 
 const store = createStore(
 	reducer,
-	compose(middleWare, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())
+	compose(middleWare)
 )
 
 ReactDOM.render(
